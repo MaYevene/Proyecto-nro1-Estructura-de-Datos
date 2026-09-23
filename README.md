@@ -3,6 +3,7 @@ Integrantes: Matias Yevenes, Eban Delgado, Carlos Cofre
 
 
 Organizacion: Este proyecto se repartira en 3 partes:
+
 -Funcionalidad: El encargado debera asegurarse de que el reproductor de musica fucnione correctamente
   Eban Delgado
   
