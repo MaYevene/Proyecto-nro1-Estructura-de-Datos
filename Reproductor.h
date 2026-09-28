@@ -1,37 +1,39 @@
 /**
  * @file Reproductor.h
- * @brief esto pa funciones
+ * @brief Funciones y estructuras para el reproductor
  */
 
 #ifndef REPRODUCT_H
 #define REPRODUCT_H
+#define Cant_Al 5
+#define Cant_So 5
+
+#include <stdio.h>
+#include <stdlib.h>
+#include<time.h>
 
 /**
  * @brief Estructura para canciones
- * 
  */
-
-typedef struct{
+typedef struct {
     int id;
     int duracion_s;
     int anio;
     int n_reprodcciones;
-    char titulo[100];
-    char artista[100];
-    char genero[50];
-}Songs;
+    char titulo[20];
+    char artista[20];
+    char genero[20];
+    char albums[20];
+} Songs;
 
 /**
  * @brief Estructura para Albumes
- * 
  */
+typedef struct {
+    Songs cancion[Cant_Al][Cant_So];
+} Album;
 
-typedef struct{
-    char albums[100];
-    int Al_cant[5];
-    Songs cancion[25];
-}Album;
-
+void Generar(Album *albumes);
 void Lista_albumes(Album *albumes);
 
-#endif 
+#endif
