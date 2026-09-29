@@ -63,9 +63,83 @@ void Generar(Album *albumes)
         {
             variable=rand()%1000000;
             
-            albumes->cancion[i][j].n_reprodcciones=variable;
+            albumes->cancion[i][j].n_reprodcciones=variable ;
         }
     }
 
-    
+    for(int i=0;i<Cant_Al;i++)
+    {
+        for(int j=0;j<Cant_So;j++)
+        {
+            for(int k=0;k<10;k++)
+            {
+                char chac=(rand()%26)+97;
+                if(k<=19)
+                {
+                    albumes->cancion[i][j].albums[k]=chac;
+                }
+                else
+                {
+                    albumes->cancion[i][j].albums[k]='\0';
+                }
+            }
+        }
+    }
+
+    for(int i=0;i<Cant_Al;i++)
+    {
+        for(int j=0;j<Cant_So;j++)
+        {
+            for(int k=0;k<10;k++)
+            {
+                char chac=(rand()%26)+97;
+                if(k<=19)
+                {
+                    albumes->cancion[i][j].titulo[k]=chac;
+                }
+                else
+                {
+                    albumes->cancion[i][j].titulo[k]='\0';
+                }
+            }
+        }
+    }
+
+    for(int i=0;i<Cant_Al;i++)
+    {
+        for(int j=0;j<Cant_So;j++)
+        {
+            for(int k=0;k<10;k++)
+            {
+                char chac=(rand()%26)+97;
+                if(k<=19)
+                {
+                    albumes->cancion[i][j].genero[k]=chac;
+                }
+                else
+                {
+                    albumes->cancion[i][j].genero[k]='\0';
+                }
+            }
+        }
+    }
+
+    for(int i=0;i<Cant_Al;i++)
+    {
+        for(int j=0;j<Cant_So;j++)
+        {
+            for(int k=0;k<10;k++)
+            {
+                char chac=(rand()%26)+97;
+                if(k<=19)
+                {
+                    albumes->cancion[i][j].artista[k]=chac;
+                }
+                else
+                {
+                    albumes->cancion[i][j].artista[k]='\0';
+                }
+            }
+        }
+    }
 }
