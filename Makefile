@@ -1,29 +1,36 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
-TARGET = reproductor
+CFLAGS = -Wall -Wextra -g -std=c11
+LIBS = -lallegro -lallegro_primitives -lallegro_font -lallegro_ttf -lallegro_image -lallegro_main
+BUILD_DIR = build
+TARGET = $(BUILD_DIR)/reproductor
 
-# Agrega aquí el nuevo archivo .c (por ejemplo Generar.c)
-SRCS = main.c Lista_Albumes.c Generar.c
-OBJS = main.o Lista_Albumes.o Generar.o
+SRCS = main.c Lista_Albumes.c Generar.c diseño.c
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/Lista_Albumes.o $(BUILD_DIR)/Generar.o $(BUILD_DIR)/diseño.o
 
 all: $(TARGET)
 
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/main.o: main.c Reproductor.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c main.c -o $(BUILD_DIR)/main.o
+
+$(BUILD_DIR)/Lista_Albumes.o: Lista_Albumes.c Reproductor.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c Lista_Albumes.c -o $(BUILD_DIR)/Lista_Albumes.o
+
+$(BUILD_DIR)/Generar.o: Generar.c Reproductor.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c Generar.c -o $(BUILD_DIR)/Generar.o
+
+$(BUILD_DIR)/diseño.o: diseño.c Reproductor.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c diseño.c -o $(BUILD_DIR)/diseño.o
+
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-main.o: main.c Reproductor.h
-	$(CC) $(CFLAGS) -c main.c -o main.o
-
-Lista_Albumes.o: Lista_Albumes.c Reproductor.h
-	$(CC) $(CFLAGS) -c Lista_Albumes.c -o Lista_Albumes.o
-
-Generar.o: Generar.c Reproductor.h
-	$(CC) $(CFLAGS) -c Generar.c -o Generar.o
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f *.o $(TARGET)
+	rm -rf $(BUILD_DIR)
 
 .PHONY: all clean run
