@@ -2,9 +2,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 TARGET = reproductor
 
-# Agrega aquí el nuevo archivo .c (por ejemplo Generar.c)
-SRCS = main.c Lista_Albumes.c Generar.c
-OBJS = main.o Lista_Albumes.o Generar.o
+# Agregados Fila_de_Reproduccion.c y Fila_de_Reproduccion.o
+SRCS = main.c Lista_Albumes.c Generar.c Fila_de_Reproduccion.c
+OBJS = main.o Lista_Albumes.o Generar.o Fila_de_Reproduccion.o
 
 all: $(TARGET)
 
@@ -19,6 +19,9 @@ Lista_Albumes.o: Lista_Albumes.c Reproductor.h
 
 Generar.o: Generar.c Reproductor.h
 	$(CC) $(CFLAGS) -c Generar.c -o Generar.o
+
+Fila_de_Reproduccion.o: Fila_de_Reproduccion.c Reproductor.h
+	$(CC) $(CFLAGS) -c Fila_de_Reproduccion.c -o Fila_de_Reproduccion.o
 
 run: $(TARGET)
 	./$(TARGET)
