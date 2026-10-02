@@ -1,237 +1,152 @@
-/**
- * @file
- * @brief
- */
+#include "Reproductor.h"
 
- #include "Reproductor.h"
+/* Aporte: Carlos Cofré - ordenamientos y búsqueda binaria recursiva. */
 
- /**
-  * @brief
-  * 
-  * @param albumes
-  */
-
-void Ordenar(Album *albumes, int elec_al, int elec_org);
-
-void Lista_albumes(Album *albumes)
+static int comparar_canciones(Album *albumes, ReferenciaCancion a, ReferenciaCancion b, int categoria, int descendente)
 {
-    int elec_al=0, elec_org=0;
+    Songs *cancion_a = &albumes->cancion[a.album][a.cancion];
+    Songs *cancion_b = &albumes->cancion[b.album][b.cancion];
+    int resultado = 0;
 
-    printf("Que album desea escuchar:\n");
-
-    for(int i=0;i<Cant_Al;i++)
+    if (categoria == CATEGORIA_ID)
     {
-        printf("%d°%s\n",i+1,albumes->cancion[elec_al][i].albums);
+        resultado = (cancion_a->id > cancion_b->id) - (cancion_a->id < cancion_b->id);
+    }
+    else if (categoria == CATEGORIA_ANIO)
+    {
+        resultado = (cancion_a->anio > cancion_b->anio) - (cancion_a->anio < cancion_b->anio);
+    }
+    else if (categoria == CATEGORIA_DURACION)
+    {
+        resultado = (cancion_a->duracion_s > cancion_b->duracion_s) - (cancion_a->duracion_s < cancion_b->duracion_s);
+    }
+    else if (categoria == CATEGORIA_REPRODUCCIONES)
+    {
+        resultado = (cancion_a->n_reprodcciones > cancion_b->n_reprodcciones) -
+                    (cancion_a->n_reprodcciones < cancion_b->n_reprodcciones);
+    }
+    else if (categoria == CATEGORIA_GENERO)
+    {
+        resultado = strcmp(cancion_a->genero, cancion_b->genero);
+    }
+    else if (categoria == CATEGORIA_ARTISTA)
+    {
+        resultado = strcmp(cancion_a->artista, cancion_b->artista);
+    }
+    else if (categoria == CATEGORIA_TITULO)
+    {
+        resultado = strcmp(cancion_a->titulo, cancion_b->titulo);
+    }
+    else if (categoria == CATEGORIA_ALBUM)
+    {
+        resultado = strcmp(cancion_a->albums, cancion_b->albums);
     }
 
-    printf("\t>>>");
-    scanf("%d",&elec_al);
-
-    while (elec_al<1 || elec_al>5)
+    if (descendente)
     {
-        printf("La eleccion no esta entre los parametros posibles\nPor favor elija una opcion existentes");
-        printf("\t>>>");
-        scanf("%d",&elec_al);
+        resultado = -resultado;
     }
 
-    printf("Indique el filtro de busqueda\n");
-    
-    printf("1° id\n");
-    printf("2° Titulo\n");
-    printf("3° artista\n");
-    printf("4° Genero\n");
-    printf("5° Duracion en segundos\n");
-    printf("6° Año de lanzamiento\n");
-    printf("7° Numero de reproducciones\n");
-
-    printf("\t>>>");
-    scanf("%d",&elec_org);
-
-    while (elec_org<1 || elec_org>7)
-    {
-        printf("La eleccion no esta entre los parametros posibles\nPor favor elija una opcion existentes");
-        printf("\t>>>");
-        scanf("%d",&elec_org);
-    }
-
-/*    for(int i=0;i<Cant_Al;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("id:%d|\tDuracion en segundos:%ds|\tNumero de reproducciones:%d|\tAño de lanzamiento:%d\n",albumes->cancion[elec_al][i].id,albumes->cancion[elec_al][i].duracion_s,albumes->cancion[elec_al][i].n_reprodcciones,albumes->cancion[elec_al][i].anio);
-    }*/
-
-    Ordenar(albumes,elec_al,elec_org);
-
-    switch (elec_org)
-    {
-    case 1:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("id:%d|\tTitulo:%s|\tArtista:%s|\tGenero:%s|\tDuracion en segundos:%d|\tAño de lanzamiento:%d|\tNumero de reproducciones:%d\n",
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].anio,
-        albumes->cancion[elec_al][i].n_reprodcciones);
-    }
-        break;
-    case 2:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("Titulo:%s|\tid:%d|\tArtista:%s|\tGenero:%s|\tDuracion en segundos:%d|\tAño de lanzamiento:%d|\tNumero de reproducciones:%d\n",
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].anio,
-        albumes->cancion[elec_al][i].n_reprodcciones);
-    }
-        break;
-    case 3:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("Artista:%s|\tid:%d|\tTitulo:%s|\tGenero:%s|\tDuracion en segundos:%d|\tAño de lanzamiento:%d|\tNumero de reproducciones:%d\n",
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].anio,
-        albumes->cancion[elec_al][i].n_reprodcciones);
-    }
-        break;
-    case 4:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("Genero:%s|\tid:%d|\tTitulo:%s|\tArtista:%s|\tDuracion en segundos:%d|\tAño de lanzamiento:%d|\tNumero de reproducciones:%d\n",
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].anio,
-        albumes->cancion[elec_al][i].n_reprodcciones);
-    }
-        break;
-    case 5:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("Duracion en segundos:%d|\tid:%d|\tTitulo:%s|\tArtista:%s|\tGenero:%s|\tAño de lanzamiento:%d|\tNumero de reproducciones:%d\n",
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].anio,
-        albumes->cancion[elec_al][i].n_reprodcciones);
-    }
-        break;
-    case 6:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("Año de lanzamiento:%d|\tid:%d|\tTitulo:%s|\tArtista:%s|\tGenero:%s|\tDuracion en segundos:%d|\tNumero de reproducciones:%d\n",
-        albumes->cancion[elec_al][i].anio,
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].n_reprodcciones);
-    }
-        break;
-    case 7:for(int i=0;i<Cant_So;i++)
-    {
-        printf("\n%d°",i+1);
-        printf("Numero de reproducciones:%d|\tid:%d|\tTitulo:%s|\tArtista:%s|\tGenero:%s|\tDuracion en segundos:%d|\tAño de lanzamiento:%d\n",
-        albumes->cancion[elec_al][i].n_reprodcciones,
-        albumes->cancion[elec_al][i].id,
-        albumes->cancion[elec_al][i].titulo,
-        albumes->cancion[elec_al][i].artista,
-        albumes->cancion[elec_al][i].genero,
-        albumes->cancion[elec_al][i].duracion_s,
-        albumes->cancion[elec_al][i].anio);
-    }
-        break;
-    }
-
-    printf("\t>>>");
-    scanf("%d",&albumes->Eleccion);
+    return resultado;
 }
 
-/**
- * @brief
- * 
- * @param albumes
- */
-
-void Ordenar(Album *albumes, int elec_al, int elec_org)
+static void intercambiar_referencias(ReferenciaCancion *a, ReferenciaCancion *b)
 {
-    for(int j=0;j<Cant_So-1;j++)
+    ReferenciaCancion temporal = *a;
+    *a = *b;
+    *b = temporal;
+}
+
+void ordenar_referencias_burbuja(Album *albumes, ReferenciaCancion canciones[], int cantidad, int categoria)
+{
+    int pasada;
+    int indice;
+
+    for (pasada = 0; pasada < cantidad - 1; pasada++)
     {
-        for(int i=0;i<Cant_So-1;i++)
+        for (indice = 0; indice < cantidad - pasada - 1; indice++)
         {
-            switch (elec_org)
+            if (comparar_canciones(albumes, canciones[indice], canciones[indice + 1], categoria, 0) > 0)
             {
-            case 1:
-                if(albumes->cancion[elec_al][i].id>albumes->cancion[elec_al][i+1].id)
-                {
-                    int aux=albumes->cancion[elec_al][i].id;
-                    albumes->cancion[elec_al][i].id=albumes->cancion[elec_al][i+1].id;
-                    albumes->cancion[elec_al][i+1].id=aux;
-                }
-                break;
-            case 2:
-                if(albumes->cancion[elec_al][i].titulo[0]>albumes->cancion[elec_al][i+1].titulo[0])
-                {
-                    char aux=albumes->cancion[elec_al][i].titulo[0];
-                    albumes->cancion[elec_al][i].titulo[0]=albumes->cancion[elec_al][i+1].titulo[0];
-                    albumes->cancion[elec_al][i+1].titulo[0]=aux;
-                }
-                break;
-            case 3:
-                if(albumes->cancion[elec_al][i].artista[0]>albumes->cancion[elec_al][i+1].artista[0])
-                {
-                    char aux=albumes->cancion[elec_al][i].artista[0];
-                    albumes->cancion[elec_al][i].artista[0]=albumes->cancion[elec_al][i+1].artista[0];
-                    albumes->cancion[elec_al][i+1].artista[0]=aux;
-                }
-                break;
-            case 4:
-                if(albumes->cancion[elec_al][i].genero[0]>albumes->cancion[elec_al][i+1].genero[0])
-                {
-                    char aux=albumes->cancion[elec_al][i].genero[0];
-                    albumes->cancion[elec_al][i].genero[0]=albumes->cancion[elec_al][i+1].genero[0];
-                    albumes->cancion[elec_al][i+1].genero[0]=aux;
-                }
-                break;
-            case 5:
-                if(albumes->cancion[elec_al][i].duracion_s>albumes->cancion[elec_al][i+1].duracion_s)
-                {
-                    int aux=albumes->cancion[elec_al][i].duracion_s;
-                    albumes->cancion[elec_al][i].duracion_s=albumes->cancion[elec_al][i+1].duracion_s;
-                    albumes->cancion[elec_al][i+1].duracion_s=aux;
-                }
-                break;
-            case 6:
-                if(albumes->cancion[elec_al][i].anio>albumes->cancion[elec_al][i+1].anio)
-                {
-                    int aux=albumes->cancion[elec_al][i].anio;
-                    albumes->cancion[elec_al][i].anio=albumes->cancion[elec_al][i+1].anio;
-                    albumes->cancion[elec_al][i+1].anio=aux;
-                }
-                break;
-            case 7:
-                if(albumes->cancion[elec_al][i].n_reprodcciones>albumes->cancion[elec_al][i+1].n_reprodcciones)
-                {
-                    int aux=albumes->cancion[elec_al][i].n_reprodcciones;
-                    albumes->cancion[elec_al][i].n_reprodcciones=albumes->cancion[elec_al][i+1].n_reprodcciones;
-                    albumes->cancion[elec_al][i+1].n_reprodcciones=aux;
-                }
-                break;
+                intercambiar_referencias(&canciones[indice], &canciones[indice + 1]);
             }
         }
     }
+}
+
+static int particionar_referencias(Album *albumes, ReferenciaCancion canciones[], int inicio, int fin,
+                                   int categoria, int descendente)
+{
+    ReferenciaCancion pivote = canciones[fin];
+    int limite = inicio - 1;
+    int indice;
+
+    for (indice = inicio; indice < fin; indice++)
+    {
+        if (comparar_canciones(albumes, canciones[indice], pivote, categoria, descendente) <= 0)
+        {
+            limite++;
+            intercambiar_referencias(&canciones[limite], &canciones[indice]);
+        }
+    }
+
+    intercambiar_referencias(&canciones[limite + 1], &canciones[fin]);
+    return limite + 1;
+}
+
+void ordenar_referencias_recursivo(Album *albumes, ReferenciaCancion canciones[], int inicio, int fin,
+                                   int categoria, int descendente)
+{
+    int pivote;
+
+    if (inicio < fin)
+    {
+        pivote = particionar_referencias(albumes, canciones, inicio, fin, categoria, descendente);
+        ordenar_referencias_recursivo(albumes, canciones, inicio, pivote - 1, categoria, descendente);
+        ordenar_referencias_recursivo(albumes, canciones, pivote + 1, fin, categoria, descendente);
+    }
+}
+
+int buscar_id_binaria_recursiva(Album *albumes, ReferenciaCancion canciones[], int inicio, int fin, int id)
+{
+    int medio;
+    int id_medio;
+
+    if (inicio > fin)
+    {
+        return -1;
+    }
+
+    medio = inicio + (fin - inicio) / 2;
+    id_medio = albumes->cancion[canciones[medio].album][canciones[medio].cancion].id;
+
+    if (id_medio == id)
+    {
+        return medio;
+    }
+    if (id < id_medio)
+    {
+        return buscar_id_binaria_recursiva(albumes, canciones, inicio, medio - 1, id);
+    }
+
+    return buscar_id_binaria_recursiva(albumes, canciones, medio + 1, fin, id);
+}
+
+void crear_indice_por_id(Album *albumes, ReferenciaCancion canciones[])
+{
+    int album;
+    int cancion;
+    int posicion = 0;
+
+    for (album = 0; album < Cant_Al; album++)
+    {
+        for (cancion = 0; cancion < Cant_So; cancion++)
+        {
+            canciones[posicion].album = album;
+            canciones[posicion].cancion = cancion;
+            posicion++;
+        }
+    }
+
+    ordenar_referencias_recursivo(albumes, canciones, 0, posicion - 1, CATEGORIA_ID, 0);
 }

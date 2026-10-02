@@ -1,0 +1,151 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlist{nosep}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.2}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{black!25},
+  backgroundcolor=\color{black!3},
+  showstringspaces=false
+}
+
+\title{Proyecto 1: Reproductor de música}
+\author{Matías Yevenes \and Carlos Cofré \and Eban Delgado}
+\date{Estructura de Datos \\ 2 de octubre de 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{center}
+Docente: Jacqueline Aldridge\\
+\end{center}
+\vfill
+\begin{center}
+Informe técnico del proyecto
+\end{center}
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introducción}
+El proyecto implementa una simulación de un reproductor de música. Mantiene un catálogo de canciones en arreglos, permite ordenar y consultar sus datos, simula la reproducción, administra una cola y conserva un historial reciente. No reproduce archivos de audio: el temporizador de Allegro representa el avance de una canción y actualiza su contador al finalizar.
+
+El desarrollo sigue los requisitos del enunciado \textit{Proyecto 1: Reproductor de música} de la asignatura Estructura de Datos. La interfaz de uso activa es una ventana gráfica hecha con Allegro 5.
+
+\section{Objetivos}
+\begin{itemize}
+  \item Organizar un catálogo de canciones mediante arreglos estáticos.
+  \item Aplicar ordenamiento iterativo y recursivo, además de búsqueda binaria recursiva.
+  \item Consultar canciones, artistas, géneros y estadísticas de reproducción.
+  \item Simular reproducción, cola e historial, manteniendo los datos numéricos dentro de rangos válidos.
+  \item Cargar y exportar el catálogo en formato CSV.
+\end{itemize}
+
+\section{Estructuras y catálogo}
+La estructura \texttt{Songs} contiene ID, duración, año, reproducciones y cadenas para título, artista, género y álbum. \texttt{Album} agrupa una matriz de \texttt{Songs}, más los arreglos y contadores de cola e historial. La estructura \texttt{ReferenciaCancion} almacena dos índices (álbum y canción); se ordenan estas referencias en vez de mover canciones, por lo que las operaciones conservan intactos los registros.
+
+El tamaño actual es de 15 álbumes con 25 canciones por álbum, para un total de 375 registros. La memoria se reserva mediante arreglos estáticos; no se utiliza asignación dinámica.
+
+\subsection{Generación y validación}
+\texttt{Generar.c} asigna IDs consecutivos desde 1 hasta 375. Después mezcla las canciones dentro de cada álbum mediante Fisher--Yates, conservando juntas las canciones que pertenecen a cada álbum. La duración generada está entre 120 y 219 segundos, el año entre 2000 y 2008 y las reproducciones entre 0 y 999\,999. Los textos aleatorios tienen diez letras minúsculas; cada álbum conserva el mismo nombre en sus 25 canciones.
+
+Al cargar el CSV se comprueba que los campos estén presentes, que la duración sea positiva, que las reproducciones no sean negativas, que el año esté entre 1900 y 2100 y que los IDs sean únicos y estén en el rango esperado. Si el archivo no se puede cargar o no cumple estas condiciones, se genera un catálogo nuevo y se guarda.
+
+\section{Algoritmos}
+\subsection{Ordenamiento iterativo}
+\texttt{ordenar\_referencias\_burbuja} implementa Bubble Sort. Compara canciones mediante la referencia a sus posiciones y permite ordenar por ID, año, duración, reproducciones, género, artista, título o álbum. En la ventana, primero se elige un álbum y luego se ordenan sus canciones.
+
+\subsection{Ordenamiento recursivo}
+\texttt{ordenar\_referencias\_recursivo} implementa Quick Sort con partición. Se utiliza para ordenar el índice del catálogo por ID antes de la búsqueda binaria y para construir el ranking descendente de reproducciones.
+\subsection{Búsqueda binaria recursiva}
+\texttt{buscar\_id\_binaria\_recursiva} busca un ID en el índice ordenado. En cada llamada compara el ID buscado con el elemento central y continúa únicamente en la mitad correspondiente. Devuelve la posición del índice o $-1$ si no existe.
+
+La búsqueda por título, artista y género admite coincidencias parciales y no distingue mayúsculas de minúsculas; esas consultas recorren el catálogo linealmente. La búsqueda binaria se aplica al ID, que es el campo numérico único usado para construir el índice.
+
+\section{Consultas y estadísticas}
+La interfaz permite buscar canciones por ID, título, artista o género. La vista de estadísticas permite listar artistas disponibles, listar y contar coincidencias por género, mostrar el top $N$ de canciones por reproducciones y encontrar la canción o canciones con más reproducciones dentro de un artista o género indicado.
+
+El listado de artistas conserva una referencia a una canción por cada nombre de artista distinto. Los resultados se muestran con sus campos principales y se pueden seleccionar para abrir la vista de reproducción.
+
+\section{Reproducción, cola e historial}
+La duración se simula con un temporizador Allegro. Al terminar una canción se incrementa \texttt{n\_reprodcciones}; si hay canciones pendientes, se retira y reproduce el primer elemento de la cola.
+
+La cola admite hasta diez canciones. Cada elemento se representa mediante los índices de álbum y canción empaquetados en un entero. La inserción se realiza al comienzo, se rechazan duplicados y se puede quitar el elemento seleccionado, quitar por ID, vaciar la cola o reproducir el primero. El historial también conserva hasta diez elementos, colocando el más reciente al inicio y desplazando los anteriores al superar el límite.
+
+\section{Persistencia y ejecución}
+El archivo \texttt{catalogo.csv} se carga al iniciar y se actualiza al cerrar el programa. Además, al finalizar se genera \texttt{catalogo\_actualizado.csv} con los datos actuales, incluidos los contadores de reproducción.
+
+La compilación en Linux utiliza el \texttt{Makefile} y las dependencias de Allegro 5 obtenidas con \texttt{pkg-config}:
+\begin{lstlisting}[language=bash]
+make
+make run
+make clean
+\end{lstlisting}
+
+\section{Verificación}
+La compilación limpia se realizó con \texttt{make clean \&\& make}, usando \texttt{-Wall -Wextra -std=c99}, y finalizó sin errores ni advertencias. La revisión de ambos CSV comprobó 375 registros, IDs únicos dentro del rango y valores numéricos válidos.
+
+No se incorporó un conjunto automatizado de pruebas al repositorio; la prueba de algoritmos fue una verificación puntual durante el desarrollo.
+
+\section{Aportes asignados}
+La distribución concreta sigue las responsabilidades generales descritas en el README del proyecto y asigna grupos identificables de funciones a cada integrante. Los mismos responsables están señalados mediante comentarios en los archivos fuente.
+
+\begin{tabularx}{\textwidth}{p{3.1cm}X X}
+\toprule
+\textbf{Integrante} & \textbf{Responsabilidad asignada} & \textbf{Secciones del código} \\
+\midrule
+Matías Yevenes & Diseño e interacción de la ventana Allegro: navegación, controles, presentación de álbumes, canciones, reproductor, búsqueda, estadísticas, cola e historial. & \path{main.c}: dibujo de vistas, controles, eventos de ratón y teclado e inicialización de Allegro. \\
+Carlos Cofré & Algoritmos y consultas: comparación y ordenamiento de referencias, búsqueda binaria por ID, búsqueda por campos y cálculo de estadísticas. & \path{Lista_Albumes.c}; funciones de búsqueda, preparación de resultados y estadísticas en \path{main.c}. \\
+Eban Delgado & Funcionalidad de datos y reproducción: estructuras, generación, validación y persistencia CSV, cola, historial y avance simulado. & \path{Reproductor.h}, \path{Generar.c}, \path{Fila_de_Reproduccion.c}; carga/exportación y ciclo de reproducción en \path{main.c}. \\
+\bottomrule
+\end{tabularx}
+
+\section{Diferencias y alcance}
+El enunciado solicita un menú de línea de comandos; la versión actual utiliza Allegro como interfaz principal. El ordenamiento interactivo se aplica a las canciones del álbum seleccionado, no a una vista global del catálogo. El criterio por álbum queda disponible, aunque dentro de un álbum todos sus registros comparten ese valor. Los nombres de artista y género se generan como cadenas aleatorias, en lugar de seleccionarse de listas predefinidas. Estas diferencias se dejan registradas para no presentar como implementadas funcionalidades distintas de las que ofrece el código.
+
+\clearpage
+\section{Declaración de uso de inteligencia artificial}
+Durante la preparación de esta versión se utilizó GitHub Copilot como apoyo para revisar algoritmos e integrar la interfaz como diseño (en Allegro). La asistencia generó o modificó secciones de \path{Fila_de_Reproduccion.c}, \path{main.c}, y \path{Reproductor.h}; los cambios se compilaron y se verificaron según se describe en la sección de pruebas.
+
+
+
+El uso personal de IA se indica a continuación:
+
+\begin{itemize}
+  \item \textbf{Matías Yevenes:} \emph{[GEMINI: Apoyo en el diseño de la interfaz, hecha en Allegro en C y apoyo en el ordenamiento numérico y alfabético de los nombres de las canciones / duraciones de estas, etc. Para apoyo básico en el uso de ordenamiento de datos.]}
+  \item \textbf{Carlos Cofré:} \emph{[COPILOT: Uso de Inteligencia artificial en la verificación de código para revisión de redundancia, indentación, y órden, en general.]}
+  \item \textbf{Eban Delgado:} \emph{[COPILOT: Uso de Inteligencia artificial para revisión de implementación en torno a lo pedido en el enunciado y para implementación de la generacion de csr para el proyecto.]}
+\end{itemize}
+
+
+Funciones Generadas con Inteligencia artificial utilizadas en el código:
+\begin{lstlisting}[language=bash]
+
+en "main.c" : "int main(void), typedef struct {} estado_ventana; & static int punto_en_rectangulo(int x, int y, int rx, int ry, int rw, int rh)"
+\end{lstlisting}
+
+\begin{thebibliography}{9}
+\bibitem{eda}
+Aldridge, Jacqueline. \textit{Proyecto 1: Reproductor de música}. Curso Estructura de Datos, 2026. Enunciado proporcionado como \path{EDA_Tarea1.pdf}.
+\end{thebibliography}
+
+\end{document}

@@ -5,6 +5,19 @@
 
  #include "Reproductor.h"
 
+/* Aporte: Eban Delgado - generación y mezcla Fisher-Yates del catálogo. */
+
+static void generar_texto(char texto[11])
+{
+    int i;
+
+    for (i = 0; i < 10; i++)
+    {
+        texto[i] = (rand() % 26) + 'a';
+    }
+    texto[10] = '\0';
+}
+
  /**
   * @brief
   * 
@@ -13,133 +26,38 @@
 
 void Generar(Album *albumes)
 {
-    int variable;
+    int i;
+    int j;
+    int posicion;
 
     srand(time(0));
 
-    for(int i=0;i<Cant_Al;i++)
+    for (i = 0; i < Cant_Al; i++)
     {
-        for(int j=0;j<Cant_So;j++)
+        for (j = 0; j < Cant_So; j++)
         {
-            variable=rand()%100000;
-            
-            albumes->cancion[i][j].id=variable;
+            albumes->cancion[i][j].id = i * Cant_So + j + 1;
+            albumes->cancion[i][j].duracion_s = (rand() % 100) + 120;
+            albumes->cancion[i][j].anio = (rand() % 9) + 2000;
+            albumes->cancion[i][j].n_reprodcciones = rand() % 1000000;
+            generar_texto(albumes->cancion[i][j].titulo);
+            generar_texto(albumes->cancion[i][j].artista);
+            generar_texto(albumes->cancion[i][j].genero);
         }
-    }
 
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
+        generar_texto(albumes->cancion[i][0].albums);
+        for (j = 1; j < Cant_So; j++)
         {
-            variable=(rand()%100)+120;
-            
-            albumes->cancion[i][j].duracion_s=variable;
+            strcpy(albumes->cancion[i][j].albums, albumes->cancion[i][0].albums);
         }
-    }
-    
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
-        {
-            variable=(rand()%9)+2000;
-            
-            albumes->cancion[i][j].anio=variable;
-        }
-    }
 
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
+        for (j = Cant_So - 1; j > 0; j--)
         {
-            variable=rand()%1000000;
-            
-            albumes->cancion[i][j].n_reprodcciones=variable;
-        }
-    }
-
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
-        {
-            variable=rand()%1000000;
-            
-            albumes->cancion[i][j].n_reprodcciones=variable ;
-        }
-    }
-
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
-        {
-            for(int k=0;k<10;k++)
-            {
-                char chac=(rand()%26)+97;
-                if(k<=19)
-                {
-                    albumes->cancion[i][j].albums[k]=chac;
-                }
-                else
-                {
-                    albumes->cancion[i][j].albums[k]='\0';
-                }
-            }
-        }
-    }
-
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
-        {
-            for(int k=0;k<10;k++)
-            {
-                char chac=(rand()%26)+97;
-                if(k<=19)
-                {
-                    albumes->cancion[i][j].titulo[k]=chac;
-                }
-                else
-                {
-                    albumes->cancion[i][j].titulo[k]='\0';
-                }
-            }
-        }
-    }
-
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
-        {
-            for(int k=0;k<10;k++)
-            {
-                char chac=(rand()%26)+97;
-                if(k<=19)
-                {
-                    albumes->cancion[i][j].genero[k]=chac;
-                }
-                else
-                {
-                    albumes->cancion[i][j].genero[k]='\0';
-                }
-            }
-        }
-    }
-
-    for(int i=0;i<Cant_Al;i++)
-    {
-        for(int j=0;j<Cant_So;j++)
-        {
-            for(int k=0;k<10;k++)
-            {
-                char chac=(rand()%26)+97;
-                if(k<=19)
-                {
-                    albumes->cancion[i][j].artista[k]=chac;
-                }
-                else
-                {
-                    albumes->cancion[i][j].artista[k]='\0';
-                }
-            }
+            Songs temporal;
+            posicion = rand() % (j + 1);
+            temporal = albumes->cancion[i][j];
+            albumes->cancion[i][j] = albumes->cancion[i][posicion];
+            albumes->cancion[i][posicion] = temporal;
         }
     }
 }

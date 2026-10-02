@@ -1,32 +1,31 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
-TARGET = reproductor
+ALLEGRO_CFLAGS := $(shell pkg-config --cflags allegro-5 allegro_primitives-5 allegro_font-5 allegro_ttf-5)
+ALLEGRO_LIBS := $(shell pkg-config --libs allegro-5 allegro_primitives-5 allegro_font-5 allegro_ttf-5)
+CFLAGS = -Wall -Wextra -std=c99 $(ALLEGRO_CFLAGS)
+LDLIBS = $(ALLEGRO_LIBS)
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
+TARGET = $(BUILD_DIR)/reproductor
 
-# Agregados Fila_de_Reproduccion.c y Fila_de_Reproduccion.o
 SRCS = main.c Lista_Albumes.c Generar.c Fila_de_Reproduccion.c
-OBJS = main.o Lista_Albumes.o Generar.o Fila_de_Reproduccion.o
+OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDLIBS)
 
-main.o: main.c Reproductor.h
-	$(CC) $(CFLAGS) -c main.c -o main.o
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
-Lista_Albumes.o: Lista_Albumes.c Reproductor.h
-	$(CC) $(CFLAGS) -c Lista_Albumes.c -o Lista_Albumes.o
-
-Generar.o: Generar.c Reproductor.h
-	$(CC) $(CFLAGS) -c Generar.c -o Generar.o
-
-Fila_de_Reproduccion.o: Fila_de_Reproduccion.c Reproductor.h
-	$(CC) $(CFLAGS) -c Fila_de_Reproduccion.c -o Fila_de_Reproduccion.o
+$(OBJ_DIR)/%.o: %.c Reproductor.h | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f *.o $(TARGET)
+	rm -f *.o reproductor $(OBJS) $(TARGET)
+	rmdir $(OBJ_DIR) $(BUILD_DIR) 2>/dev/null || true
 
 .PHONY: all clean run

@@ -1,0 +1,10 @@
+*.o
+/reproductor
+/build/
+/catalogo_actualizado.csv
+/Informe/*.aux
+/Informe/*.fdb_latexmk
+/Informe/*.fls
+/Informe/*.log
+/Informe/*.out
+/Informe/*.toc
